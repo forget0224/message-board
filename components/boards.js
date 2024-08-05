@@ -13,10 +13,10 @@ export default function Boards({ showAdd }) {
 
   return (
     <div
-      className={`${showAdd ? 'h-[200px]' : 'h-[500px]'} transition-all duration-400 lg:w-[800px] w-[350px] border-2 border-[#808c8f] `}
+      className={`${showAdd ? 'h-[200px] sm:h-[400px]' : 'h-[500px]'} transition-all duration-500 lg:w-[800px] w-[350px] border-2 border-[#808c8f] `}
     >
       <div
-        className={`grid  ${showAdd ? 'grid-cols-3 gap-2' : 'grid-cols-2 gap-10'}   sm:grid-cols-2 lg:grid-cols-3 gap-2 p-4  justify-items-center`}
+        className={`grid  ${showAdd ? 'grid-cols-3 gap-8' : 'grid-cols-2 gap-10'}   sm:grid-cols-2 lg:grid-cols-3 gap-2 p-4  justify-items-center`}
       >
         {notesData.map((note, index) => (
           <Note

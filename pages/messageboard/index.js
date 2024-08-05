@@ -33,7 +33,7 @@ export default function Home() {
           />
         </div>
         {showAdd && (
-          <div className="flex flex-col items-center justify-center py-4 transition-all duration-300">
+          <div className="flex flex-col items-center justify-center py-4 transition-all duration-300 ">
             <Typearea
               username={username}
               setUsername={setUsername}

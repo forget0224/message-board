@@ -3,7 +3,7 @@ import React from 'react'
 export default function Note({ to, from, content, showAdd }) {
   return (
     <div
-      className={`${showAdd ? 'w-20 h-20' : 'w-32 h-32'} bg-yellow-200 shadow-lg p-1  flex flex-col justify-between text-xs`}
+      className={`${showAdd ? 'w-20 h-20 sm:w-40 sm:h-40 ' : 'w-32 h-32  sm:w-52 sm:h-52'} bg-yellow-200 shadow-lg p-1  flex flex-col justify-between text-xs`}
     >
       <div className="flex justify-between w-full">
         <p className="text-gray-800 font-bold">{to}</p>
