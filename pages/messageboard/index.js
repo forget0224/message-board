@@ -11,7 +11,8 @@ export default function Home() {
   const [to, setTo] = useState('')
   const [message, setMessage] = useState('')
   const [notesData, setNotesData] = useState([])
-  const totalPages = 10
+  const notesPerPage = 6
+  const totalPages = Math.ceil(notesData.length / notesPerPage)
 
   const handlePageChange = (page) => {
     setCurrentPage(page)
@@ -37,7 +38,7 @@ export default function Home() {
       body: JSON.stringify(newNote),
     })
     const data = await response.json()
-    setNotesData([...notesData, data])
+    setNotesData([data, ...notesData])
     handleReset()
   }
   const handleReset = () => {
@@ -45,6 +46,11 @@ export default function Home() {
     setTo('')
     setMessage('')
   }
+
+  const paginatedNotes = notesData.slice(
+    (currentPage - 1) * notesPerPage,
+    currentPage * notesPerPage,
+  )
   return (
     <>
       <div className="bg-[#A8BEC3] min-h-screen flex flex-col">
@@ -53,12 +59,14 @@ export default function Home() {
           className={` flex flex-col items-center justify-around  flex-grow`}
         >
           <h1 className="font-bold">Message Board</h1>
-          <Boards showAdd={showAdd} notesData={notesData} />
-          <Pagination
-            currentPage={currentPage}
-            totalPages={totalPages}
-            onPageChange={handlePageChange}
-          />
+          <Boards showAdd={showAdd} notesData={paginatedNotes} />
+          {totalPages > 1 && (
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={handlePageChange}
+            />
+          )}
         </div>
         {showAdd && (
           <div className="flex flex-col items-center justify-center py-4 transition-all duration-300 ">

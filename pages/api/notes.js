@@ -12,7 +12,8 @@ export default function handler(req, res) {
 
   switch (method) {
     case 'GET': {
-      res.status(200).json(notesData)
+      const sortedData = notesData.slice().reverse()
+      res.status(200).json(sortedData)
       break
     }
     case 'POST': {
