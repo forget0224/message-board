@@ -4,6 +4,7 @@ import Textarea from './textarea'
 export default function Typearea({
   username,
   setUsername,
+  hasUsername,
   to,
   setTo,
   message,
@@ -19,6 +20,7 @@ export default function Typearea({
               placeholder={`username`}
               value={username}
               onChange={setUsername}
+              disabled={hasUsername}
             />
             <Input
               maxLength={20}
