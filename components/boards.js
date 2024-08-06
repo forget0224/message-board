@@ -6,6 +6,10 @@ export default function Boards({
   userId,
   deleteNote,
   paginatedNotes,
+  activeNoteId,
+  onToggleOptions,
+  onEdit,
+  onReply,
 }) {
   return (
     <div
@@ -25,6 +29,11 @@ export default function Boards({
             showAdd={showAdd}
             userId={userId}
             deleteNote={deleteNote}
+            showOptions={activeNoteId === note.id}
+            onToggleOptions={onToggleOptions}
+            onEdit={onEdit}
+            onReply={onReply}
+            replies={note.replies}
           />
         ))}
       </div>

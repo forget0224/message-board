@@ -36,3 +36,18 @@ export const deleteNote = async (noteId, userId) => {
   }
   return { noteId, userId }
 }
+
+export const updateNote = async (noteId, updatedData) => {
+  const response = await fetch(`/api/notes`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ noteId, ...updatedData }),
+  })
+  if (!response.ok) {
+    throw new Error('更新失敗')
+  }
+  const data = await response.json()
+  return data
+}

@@ -12,7 +12,7 @@ export default function Typearea({
 }) {
   return (
     <>
-      <div className="bg-[#A8BEC3] lg:w-[400px] lg:h-[300px] w-[300px] h-[225px]   lg:p-4">
+      <div className=" lg:w-[400px] lg:h-[300px] w-[300px] h-[225px]   lg:p-4">
         <div className="flex flex-col justify-around items-center w-full h-full">
           <div className="flex flex-row justify-between items-center w-full gap-2">
             <Input
