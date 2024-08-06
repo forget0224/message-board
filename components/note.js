@@ -15,7 +15,22 @@ export default function Note({
   onEdit,
   onReply,
   replies = [],
+  searchQuery = '',
 }) {
+  const highlightText = (content, query) => {
+    if (!query) return content
+
+    const parts = content.split(new RegExp(`(${query})`, 'gi'))
+    return parts.map((part, index) =>
+      part.toLowerCase() === query.toLowerCase() ? (
+        <span key={index} className="bg-yellow-300">
+          {part}
+        </span>
+      ) : (
+        part
+      ),
+    )
+  }
   return (
     <div className="relative">
       <div
@@ -36,7 +51,7 @@ export default function Note({
         <p
           className={`w-full flex-grow p-1 rounded resize-none border-none focus:outline-none ${showAdd ? 'truncate' : 'break-words'}`}
         >
-          {content}
+          {highlightText(content, searchQuery)}
         </p>
         <div className="flex justify-between w-full">
           <p className="text-gray-800 font-bold text-right ml-auto">{from}</p>

@@ -2,9 +2,15 @@ import React, { useState } from 'react'
 import { GoSearch } from 'react-icons/go'
 import { GoPlus } from 'react-icons/go'
 import { GoX } from 'react-icons/go'
-export default function Header({ showAdd, setShowAdd }) {
+export default function Header({
+  showAdd,
+  setShowAdd,
+  onSearch,
+  searchQuery,
+  setSearchQuery,
+}) {
   const [showSearch, setShowSearch] = useState(false)
-  const [searchQuery, setSearchQuery] = useState('')
+
   const handleAddClick = () => {
     setShowAdd(!showAdd)
   }
@@ -13,9 +19,11 @@ export default function Header({ showAdd, setShowAdd }) {
   }
   const handleSearchChange = (e) => {
     setSearchQuery(e.target.value)
+    onSearch(e.target.value)
   }
   const handleSearchClear = () => {
     setSearchQuery('')
+    onSearch('')
   }
   return (
     <div className="w-full   bg-gray-300 ">
@@ -37,7 +45,10 @@ export default function Header({ showAdd, setShowAdd }) {
           placeholder="Search notes..."
         />
         {showSearch && (
-          <GoX onClick={handleSearchClear} className={`my-auto	-ml-7 z-20 `} />
+          <GoX
+            onClick={handleSearchClear}
+            className={`my-auto cursor-pointer	-ml-7 z-20 `}
+          />
         )}
 
         <button

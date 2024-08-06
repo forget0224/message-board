@@ -10,6 +10,7 @@ export default function Boards({
   onToggleOptions,
   onEdit,
   onReply,
+  searchQuery,
 }) {
   return (
     <div
@@ -34,6 +35,7 @@ export default function Boards({
             onEdit={onEdit}
             onReply={onReply}
             replies={note.replies}
+            searchQuery={searchQuery}
           />
         ))}
       </div>

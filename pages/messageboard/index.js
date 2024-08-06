@@ -33,8 +33,10 @@ export default function Home() {
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [modalContent, setModalContent] = useState(null)
   const [currentNote, setCurrentNote] = useState(null)
+  const [filteredNotes, setFilteredNotes] = useState([])
+  const [searchQuery, setSearchQuery] = useState('')
   const notesPerPage = 6
-  const totalPages = Math.ceil(notesData.length / notesPerPage)
+  const totalPages = Math.ceil(filteredNotes.length / notesPerPage)
 
   const handlePageChange = (page) => {
     setCurrentPage(page)
@@ -50,6 +52,7 @@ export default function Home() {
       try {
         const data = await fetchNotes()
         setNotesData(data)
+        setFilteredNotes(data)
       } catch (error) {
         console.error('載入notes失敗', error)
       }
@@ -174,14 +177,37 @@ export default function Home() {
     }
   }, [])
 
-  const paginatedNotes = notesData.slice(
+  const handleSearch = (query) => {
+    setSearchQuery(query)
+    if (!query) {
+      setFilteredNotes(notesData)
+    } else {
+      const lowerCaseQuery = query.toLowerCase()
+      const filtered = notesData.filter(
+        (note) =>
+          note.content.toLowerCase().includes(lowerCaseQuery) ||
+          note.to.toLowerCase().includes(lowerCaseQuery) ||
+          note.from.toLowerCase().includes(lowerCaseQuery),
+      )
+      setFilteredNotes(filtered)
+    }
+    setCurrentPage(1) // 每次搜索時重置為第一頁
+  }
+
+  const paginatedNotes = filteredNotes.slice(
     (currentPage - 1) * notesPerPage,
     currentPage * notesPerPage,
   )
   return (
     <>
       <div className="bg-[#A8BEC3] min-h-screen flex flex-col">
-        <Header showAdd={showAdd} setShowAdd={setShowAdd} />
+        <Header
+          showAdd={showAdd}
+          setShowAdd={setShowAdd}
+          onSearch={handleSearch}
+          searchQuery={searchQuery}
+          setSearchQuery={setSearchQuery}
+        />
         <div
           className={` flex flex-col items-center justify-around  flex-grow`}
         >
@@ -196,6 +222,7 @@ export default function Home() {
             onToggleOptions={handleToggleOptions}
             onEdit={handleEdit}
             onReply={handleReply}
+            searchQuery={searchQuery}
           />
           {totalPages > 1 && (
             <Pagination
