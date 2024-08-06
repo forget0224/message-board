@@ -96,7 +96,7 @@ export default function Home() {
   const handleEdit = (noteId) => {
     const note = notesData.find((note) => note.id === noteId)
     setCurrentNote(note)
-    setUsername(note.from)
+    setUsername(username)
     setTo(note.to)
     setMessage(note.content)
     setModalContent('edit')
@@ -106,8 +106,8 @@ export default function Home() {
   const handleReply = (noteId) => {
     const note = notesData.find((note) => note.id === noteId)
     setCurrentNote(note)
-    setUsername(note.from)
-    setTo(note.to)
+    setUsername(username)
+    setTo(note.to || '')
     setMessage('')
     setModalContent('reply')
     setIsModalOpen(true)
@@ -117,12 +117,15 @@ export default function Home() {
     setIsModalOpen(false)
     setModalContent(null)
     setCurrentNote(null)
+    setTo('')
+    setMessage('')
   }
 
   const handleSubmitEdit = async () => {
     try {
       const updatedNote = { ...currentNote, to, content: message }
-      await updateNote(updatedNote)
+      console.log(updatedNote)
+      await updateNote(currentNote.id, updatedNote)
       setNotesData(
         notesData.map((note) =>
           note.id === updatedNote.id ? updatedNote : note,
@@ -145,7 +148,7 @@ export default function Home() {
         ...currentNote,
         replies: [...currentNote.replies, reply],
       }
-      console.log(updatedNote)
+
       await updateNote(currentNote.id, updatedNote)
       setNotesData(
         notesData.map((note) =>
@@ -215,7 +218,7 @@ export default function Home() {
               setMessage={setMessage}
             />
 
-            <FormButton onSubmit={handleAddNote} handleReset={handleReset} />
+            <FormButton onSubmit={handleAddNote} onReset={handleReset} />
           </div>
         )}
       </div>
@@ -224,13 +227,13 @@ export default function Home() {
           {modalContent === 'edit' && (
             <>
               <Typearea
-                username={currentNote.from}
+                username={username}
                 setUsername={setUsername}
                 setHasUsername={setHasUsername}
                 hasUsername={hasUsername}
-                to={currentNote.to}
+                to={to}
                 setTo={setTo}
-                message={currentNote.content}
+                message={message}
                 setMessage={setMessage}
               />
               <FormButton onSubmit={handleSubmitEdit} onReset={handleReset} />
@@ -243,7 +246,7 @@ export default function Home() {
                 setUsername={setUsername}
                 setHasUsername={setHasUsername}
                 hasUsername={hasUsername}
-                to={currentNote.from}
+                to={to}
                 setTo={setTo}
                 message={message}
                 setMessage={setMessage}

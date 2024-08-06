@@ -1,10 +1,10 @@
 import React from 'react'
 
-export default function FormButton({ onSubmit, handleReset }) {
+export default function FormButton({ onSubmit, onReset }) {
   return (
     <div className="sm:w-[400px] w-full flex justify-around px-4">
       <button
-        onClick={handleReset}
+        onClick={onReset}
         className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-10 rounded focus:outline-none focus:shadow-outline"
       >
         重填
