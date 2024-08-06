@@ -9,13 +9,14 @@ export default function Note({
   showAdd,
   userId,
   noteId,
-  handleDelete,
+  deleteNote,
 }) {
   const [showOptions, setShowOptions] = useState(false)
 
   const handleToggleOptions = () => {
     setShowOptions(!showOptions)
   }
+
   return (
     <div
       className={`${showAdd ? 'w-20 h-20 sm:w-40 sm:h-40 ' : 'w-32 h-32  sm:w-52 sm:h-52'} bg-yellow-200 shadow-lg p-1 relative  flex flex-col justify-between text-xs`}
@@ -46,7 +47,7 @@ export default function Note({
                 修改 <GoPencil className="ml-2" />
               </button>
               <button
-                onClick={() => handleDelete(noteId)}
+                onClick={() => deleteNote(noteId, userId)}
                 className="flex justify-between items-center w-full px-4 py-2 text-xs sm:text-sm text-gray-700 hover:bg-gray-100"
               >
                 刪除 <GoTrash className="ml-2" />

@@ -73,21 +73,21 @@ export default function handler(req, res) {
         .replace('T', ' ')
       newNote.replies = []
       notesData.push(newNote)
-      console.log('New note added:', newNote)
+      console.log('筆記已新增:', newNote)
       res.status(201).json(newNote)
       break
     }
     case 'DELETE': {
-      const { id, userId } = req.body
+      const { noteId, userId } = req.body
       const noteIndex = notesData.findIndex(
-        (note) => note.id === id && note.userId === userId,
+        (note) => note.id === noteId && note.userId === userId,
       )
       if (noteIndex !== -1) {
         notesData.splice(noteIndex, 1)
-        console.log(`Note with ID ${id} deleted`)
-        res.status(200).json({ message: `Note with ID ${id} deleted` })
+        console.log(`Note with ID ${noteId} deleted`)
+        res.status(200).json({ message: `筆記ID:${noteId}已刪除` })
       } else {
-        res.status(404).json({ error: 'Note not found or unauthorized' })
+        res.status(404).json({ error: '找不到該筆記或未授權' })
       }
       break
     }

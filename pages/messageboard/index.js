@@ -5,6 +5,7 @@ import Boards from '@/components/boards'
 import Header from '@/components/header'
 import FormButton from '@/components/formButton'
 import { v4 as uuidv4 } from 'uuid'
+import { fetchNotes, addNote, deleteNote } from '@/services/notesService'
 const getUserId = () => {
   let userId = localStorage.getItem('userId')
   if (!userId) {
@@ -30,36 +31,47 @@ export default function Home() {
   }
 
   useEffect(() => {
-    const fetchUserId = () => {
+    const initUserId = () => {
       const id = getUserId()
       setUserId(id)
     }
 
-    const fetchNotes = async () => {
-      const response = await fetch('/api/notes')
-      const data = await response.json()
-      setNotesData(data)
+    const loadNotes = async () => {
+      try {
+        const data = await fetchNotes()
+        setNotesData(data)
+      } catch (error) {
+        console.error('載入notes失敗', error)
+      }
     }
 
-    fetchUserId()
-    fetchNotes()
+    initUserId()
+    loadNotes()
   }, [])
 
-  const addNote = async () => {
+  const handleAddNote = async () => {
     const newNote = { to, content: message, from: username, userId }
-    const response = await fetch('/api/notes', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(newNote),
-    })
-    const data = await response.json()
-    setNotesData([data, ...notesData])
-    setHasUsername(true)
-    setTo('')
-    setMessage('')
+    try {
+      const data = await addNote(newNote)
+      console.log(data)
+      setNotesData([data, ...notesData])
+      setHasUsername(true)
+      setTo('')
+      setMessage('')
+    } catch (error) {
+      console.error('新增失敗', error)
+    }
   }
+
+  const handleDelete = async (noteId, userId) => {
+    try {
+      await deleteNote(noteId, userId)
+      setNotesData(notesData.filter((note) => note.id !== noteId))
+    } catch (error) {
+      console.error('刪除失敗', error)
+    }
+  }
+
   const handleReset = () => {
     setUsername('')
     setTo('')
@@ -80,8 +92,10 @@ export default function Home() {
           <h1 className="font-bold">Message Board</h1>
           <Boards
             showAdd={showAdd}
-            notesData={paginatedNotes}
+            notesData={notesData}
+            paginatedNotes={paginatedNotes}
             userId={userId}
+            deleteNote={handleDelete}
           />
           {totalPages > 1 && (
             <Pagination
@@ -104,7 +118,7 @@ export default function Home() {
               setMessage={setMessage}
             />
 
-            <FormButton addNote={addNote} handleReset={handleReset} />
+            <FormButton addNote={handleAddNote} handleReset={handleReset} />
           </div>
         )}
       </div>
