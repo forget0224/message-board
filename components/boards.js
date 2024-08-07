@@ -11,6 +11,7 @@ export default function Boards({
   onEdit,
   onReply,
   searchQuery,
+  mode,
 }) {
   return (
     <div
@@ -36,6 +37,7 @@ export default function Boards({
             onReply={onReply}
             replies={note.replies}
             searchQuery={searchQuery}
+            mode={mode}
           />
         ))}
       </div>

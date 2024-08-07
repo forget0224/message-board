@@ -35,6 +35,7 @@ export default function Home() {
   const [currentNote, setCurrentNote] = useState(null)
   const [filteredNotes, setFilteredNotes] = useState([])
   const [searchQuery, setSearchQuery] = useState('')
+  const [mode, setMode] = useState('boards')
   const notesPerPage = 6
   const totalPages = Math.ceil(filteredNotes.length / notesPerPage)
 
@@ -52,7 +53,6 @@ export default function Home() {
       try {
         const data = await fetchNotes()
         setNotesData(data)
-        // setFilteredNotes(data)
       } catch (error) {
         console.error('載入notes失敗', error)
       }
@@ -65,6 +65,7 @@ export default function Home() {
   useEffect(() => {
     setFilteredNotes(notesData)
   }, [notesData])
+
   const handleAddNote = async () => {
     const newNote = { to, content: message, from: username, userId }
     try {
@@ -79,10 +80,30 @@ export default function Home() {
     }
   }
 
-  const handleDelete = async (noteId, userId) => {
+  const handleDelete = async (noteId, userId, replyId = null) => {
     try {
-      await deleteNote(noteId, userId)
-      setNotesData(notesData.filter((note) => note.noteId !== noteId))
+      if (replyId) {
+        const noteToUpdate = notesData.find((note) => note.noteId === noteId)
+        const updatedReplies = noteToUpdate.replies.filter(
+          (reply) => reply.id !== replyId,
+        )
+        const updatedNote = { ...noteToUpdate, replies: updatedReplies }
+        await updateNote(noteId, updatedNote)
+        setNotesData(
+          notesData.map((note) =>
+            note.noteId === noteId ? updatedNote : note,
+          ),
+        )
+        if (currentNote.noteId === noteId) {
+          setCurrentNote(updatedNote)
+        }
+      } else {
+        await deleteNote(noteId, userId)
+        setNotesData(notesData.filter((note) => note.noteId !== noteId))
+        if (currentNote.noteId === noteId) {
+          handleCloseModal()
+        }
+      }
     } catch (error) {
       console.error('刪除失敗', error)
     }
@@ -106,6 +127,7 @@ export default function Home() {
     setTo(note.to)
     setMessage(note.content)
     setModalContent('edit')
+    setMode('modal')
     setIsModalOpen(true)
   }
 
@@ -116,6 +138,7 @@ export default function Home() {
     setTo(note.to || '')
     setMessage('')
     setModalContent('reply')
+    setMode('modal')
     setIsModalOpen(true)
   }
 
@@ -123,21 +146,90 @@ export default function Home() {
     setIsModalOpen(false)
     setModalContent(null)
     setCurrentNote(null)
+    setMode('boards')
     setTo('')
     setMessage('')
   }
 
+  // const handleSubmitEdit = async () => {
+  //   try {
+  //     const updatedNote = { ...currentNote, to, content: message }
+  //     console.log(updatedNote)
+  //     await updateNote(currentNote.noteId, updatedNote)
+  //     setNotesData(
+  //       notesData.map((note) =>
+  //         note.noteId === updatedNote.noteId ? updatedNote : note,
+  //       ),
+  //     )
+  //     handleCloseModal()
+  //   } catch (error) {
+  //     console.error('更新失敗:', error)
+  //   }
+  // }
+
+  // const handleSubmitReply = async () => {
+  //   try {
+  //     const existingReplies = currentNote.replies || []
+  //     const maxId =
+  //       existingReplies.length > 0
+  //         ? Math.max(...existingReplies.map((reply) => reply.id))
+  //         : 0
+  //     const newId = maxId + 1
+
+  //     const reply = {
+  //       from: username,
+  //       content: message,
+  //       timestamp: new Date().toISOString(),
+  //       id: newId,
+  //       userId,
+  //       noteId: currentNote.noteId,
+  //     }
+
+  //     const updatedNote = {
+  //       ...currentNote,
+  //       replies: [...currentNote.replies, reply],
+  //     }
+  //     console.log(updatedNote)
+  //     await updateNote(currentNote.noteId, updatedNote)
+  //     setNotesData(
+  //       notesData.map((note) =>
+  //         note.noteId === updatedNote.noteId ? updatedNote : note,
+  //       ),
+  //     )
+  //     handleCloseModal()
+  //     console.log(notesData)
+  //   } catch (error) {
+  //     console.error('回覆失敗', error)
+  //   }
+  // }
+
   const handleSubmitEdit = async () => {
     try {
-      const updatedNote = { ...currentNote, to, content: message }
-      console.log(updatedNote)
-      await updateNote(currentNote.noteId, updatedNote)
-      setNotesData(
-        notesData.map((note) =>
-          note.noteId === updatedNote.noteId ? updatedNote : note,
-        ),
-      )
-      handleCloseModal()
+      if (currentNote.isReply) {
+        const parentNote = notesData.find(
+          (note) => note.noteId === currentNote.noteId,
+        )
+        const updatedReplies = parentNote.replies.map((reply) =>
+          reply.id === currentNote.id ? { ...reply, content: message } : reply,
+        )
+        const updatedNote = { ...parentNote, replies: updatedReplies }
+        await updateNote(currentNote.noteId, updatedNote)
+        setNotesData(
+          notesData.map((note) =>
+            note.noteId === updatedNote.noteId ? updatedNote : note,
+          ),
+        )
+        setCurrentNote(updatedNote)
+      } else {
+        const updatedNote = { ...currentNote, to, content: message }
+        await updateNote(currentNote.noteId, updatedNote)
+        setNotesData(
+          notesData.map((note) =>
+            note.noteId === updatedNote.noteId ? updatedNote : note,
+          ),
+        )
+        setCurrentNote(updatedNote)
+      }
     } catch (error) {
       console.error('更新失敗:', error)
     }
@@ -157,25 +249,27 @@ export default function Home() {
         content: message,
         timestamp: new Date().toISOString(),
         id: newId,
+        userId,
+        noteId: currentNote.noteId,
       }
 
       const updatedNote = {
         ...currentNote,
         replies: [...currentNote.replies, reply],
       }
-      console.log(updatedNote)
       await updateNote(currentNote.noteId, updatedNote)
       setNotesData(
         notesData.map((note) =>
           note.noteId === updatedNote.noteId ? updatedNote : note,
         ),
       )
-      handleCloseModal()
-      console.log(notesData)
+      setCurrentNote(updatedNote)
+      setMessage('')
     } catch (error) {
       console.error('回覆失敗', error)
     }
   }
+
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (event.target.closest('.note-options') === null) {
@@ -204,7 +298,7 @@ export default function Home() {
       )
       setFilteredNotes(filtered)
     }
-    setCurrentPage(1) // 每次搜索時重置為第一頁
+    setCurrentPage(1)
   }
 
   const paginatedNotes = filteredNotes.slice(
@@ -236,6 +330,7 @@ export default function Home() {
             onEdit={handleEdit}
             onReply={handleReply}
             searchQuery={searchQuery}
+            mode={mode}
           />
           {totalPages > 1 && (
             <Pagination
@@ -269,6 +364,12 @@ export default function Home() {
           note={currentNote}
           replies={currentNote.replies}
           onToggleOptions={handleToggleOptions}
+          activeNoteId={activeNoteId}
+          userId={userId}
+          mode={mode}
+          modalContent={modalContent}
+          setModalContent={setModalContent}
+          deleteNote={handleDelete}
         >
           {modalContent === 'edit' && (
             <>

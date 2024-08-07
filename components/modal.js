@@ -8,11 +8,26 @@ export default function modal({
   note,
   replies,
   onToggleOptions,
+  activeNoteId,
+  userId,
+  mode,
+  modalContent,
+  deleteNote,
+  onEdit,
+  setModalContent,
 }) {
-  const notesModal = [
-    { ...note, isReply: false },
-    ...replies.map((reply) => ({ ...reply, isReply: true })),
-  ]
+  const flattenNote = (note) => {
+    const noteItem = { ...note, isReply: false }
+    const replies = note.replies.map((reply) => ({
+      ...reply,
+      isReply: true,
+      noteId: note.noteId,
+    }))
+    return [noteItem, ...replies]
+  }
+
+  const notesModal = flattenNote(note)
+
   return (
     <div
       className={`fixed inset-0 z-50 flex items-center justify-center  ${isOpen ? '' : 'hidden'}`}
@@ -21,7 +36,7 @@ export default function modal({
         className="fixed inset-0 bg-black opacity-50"
         onClick={onClose}
       ></div>
-      <div className="relative w-full max-w-3xl px-4 h-full h-auto">
+      <div className="relative w-full max-w-3xl px-4  h-auto">
         <div className="bg-white rounded-lg shadow dark:bg-gray-700 relative z-50">
           <div className="flex items-start justify-between  p-3 border-b rounded-t dark:border-gray-600">
             {/* <h3 className="text-gray-900 text-xl lg:text-2xl font-semibold dark:text-white">
@@ -67,9 +82,16 @@ export default function modal({
                     showAdd={false}
                     onReply={null}
                     onEdit={null}
-                    noteId={noteItem.index}
+                    deleteNote={deleteNote}
+                    noteId={noteItem.noteId}
+                    id={index}
+                    userId={userId}
+                    fromId={noteItem.userId}
                     onToggleOptions={onToggleOptions}
-                    mode="modal"
+                    showOptions={activeNoteId === index}
+                    mode={mode}
+                    modalContent={modalContent}
+                    setModalContent={setModalContent}
                   />
                 ))}
               </div>

@@ -8,13 +8,17 @@ let notesData = [
     timestamp: '2024/08/02 10:00',
     replies: [
       {
+        noteId: 1,
         id: 1,
+        userId: 'user-3',
         from: 'Charlie',
         content: 'I will join the meeting too.',
         timestamp: '2024/08/02 11:00',
       },
       {
+        noteId: 1,
         id: 2,
+        userId: 'user-4',
         from: 'David',
         content: 'Please send me the meeting link.',
         timestamp: '2024/08/02 11:05',
@@ -30,7 +34,9 @@ let notesData = [
     timestamp: '2024/08/02 10:10',
     replies: [
       {
+        noteId: 2,
         id: 1,
+        userId: 'user-5',
         from: 'Eve',
         content: 'Thank you for the update.',
         timestamp: '2024/08/02 11:10',
@@ -55,13 +61,17 @@ let notesData = [
     timestamp: '2024/08/02 10:30',
     replies: [
       {
+        noteId: 4,
         id: 1,
+        userId: 'user-7',
         from: 'Mike',
         content: 'I have some code to review as well.',
         timestamp: '2024/08/02 11:20',
       },
       {
+        noteId: 4,
         id: 2,
+        userId: 'user-8',
         from: 'Nina',
         content: 'Looking forward to it.',
         timestamp: '2024/08/02 11:25',
@@ -77,7 +87,9 @@ let notesData = [
     timestamp: '2024/08/02 10:40',
     replies: [
       {
+        noteId: 5,
         id: 1,
+        userId: 'user-9',
         from: 'Oscar',
         content: 'Great job!',
         timestamp: '2024/08/02 11:30',

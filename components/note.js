@@ -118,7 +118,10 @@ export default function Note({
   onReply,
   replies = [],
   searchQuery = '',
-  mode = 'boards',
+  mode,
+  modalContent,
+  setModalContent,
+  id,
 }) {
   const highlightText = (content, query) => {
     if (!query) return content
@@ -135,6 +138,9 @@ export default function Note({
     )
   }
 
+  const showKebabIcon =
+    (mode === 'modal' && fromId === userId) || mode === 'boards'
+
   return (
     <div className="relative">
       <div
@@ -144,13 +150,19 @@ export default function Note({
       >
         <div className="flex justify-between w-full">
           <p className="text-gray-800 font-bold">{to}</p>
-          <GoKebabHorizontal
-            className="cursor-pointer"
-            onClick={(e) => {
-              e.stopPropagation()
-              onToggleOptions(noteId)
-            }}
-          />
+          {showKebabIcon && (
+            <GoKebabHorizontal
+              className="cursor-pointer"
+              onClick={(e) => {
+                e.stopPropagation()
+                if (mode === 'modal') {
+                  onToggleOptions(id)
+                } else {
+                  onToggleOptions(noteId)
+                }
+              }}
+            />
+          )}
         </div>
         <p
           className={`w-full flex-grow p-1 rounded resize-none border-none focus:outline-none ${showAdd ? 'truncate' : 'break-words'}`}
@@ -160,7 +172,7 @@ export default function Note({
         <div className="flex justify-between w-full">
           <p className="text-gray-800 font-bold text-right ml-auto">{from}</p>
         </div>
-        {showOptions && (
+        {/* {showOptions && (
           <div
             className="note-options absolute right-0 bg-white shadow-md rounded-md mt-3 z-10"
             onClick={(e) => e.stopPropagation()}
@@ -168,7 +180,13 @@ export default function Note({
             {fromId === userId && (
               <>
                 <button
-                  onClick={() => onEdit(noteId)}
+                  onClick={() => {
+                    if (mode === 'modal') {
+                      setModalContent('edit')
+                    } else {
+                      onEdit(noteId)
+                    }
+                  }}
                   className="flex justify-between items-center w-full px-4 py-2 text-xs sm:text-sm text-gray-700 hover:bg-gray-100"
                 >
                   修改 <GoPencil className="ml-2" />
@@ -181,12 +199,74 @@ export default function Note({
                 </button>
               </>
             )}
-            <button
-              onClick={() => onReply(noteId)}
-              className="flex justify-between items-center w-full px-4 py-2 text-xs sm:text-sm text-gray-700"
-            >
-              回覆 <GoReply className="ml-2" />
-            </button>
+
+            {modalContent === 'edit' ||
+              (mode === 'boards' && (
+                <button
+                  onClick={() => {
+                    if (mode === 'modal') {
+                      setModalContent('reply')
+                    } else {
+                      onReply(noteId)
+                    }
+                  }}
+                  className="flex justify-between items-center w-full px-4 py-2 text-xs sm:text-sm text-gray-700"
+                >
+                  回覆 <GoReply className="ml-2" />
+                </button>
+              ))}
+          </div>
+        )} */}
+        {showOptions && (
+          <div
+            className="note-options absolute right-0 bg-white shadow-md rounded-md mt-3 z-10"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {fromId === userId && (
+              <>
+                {(modalContent === 'reply' || mode === 'boards') && (
+                  <button
+                    onClick={() => {
+                      if (mode === 'modal') {
+                        setModalContent('edit')
+                      } else {
+                        onEdit(noteId)
+                      }
+                    }}
+                    className="flex justify-between items-center w-full px-4 py-2 text-xs sm:text-sm text-gray-700 hover:bg-gray-100"
+                  >
+                    修改 <GoPencil className="ml-2" />
+                  </button>
+                )}
+
+                <button
+                  onClick={() => {
+                    if (mode === 'modal') {
+                      deleteNote(noteId, userId, id)
+                    } else {
+                      deleteNote(noteId, userId)
+                    }
+                  }}
+                  className="flex justify-between items-center w-full px-4 py-2 text-xs sm:text-sm text-gray-700 hover:bg-gray-100"
+                >
+                  刪除 <GoTrash className="ml-2" />
+                </button>
+              </>
+            )}
+            {(modalContent === 'edit' || mode === 'boards') && (
+              <button
+                onClick={() => {
+                  if (mode === 'modal') {
+                    setModalContent('reply')
+                  } else {
+                    onReply(noteId)
+                  }
+                }}
+                className="flex justify-between items-center w-full px-4 py-2 text-xs sm:text-sm text-gray-700"
+              >
+                回覆 <GoReply className="ml-2" />
+              </button>
+            )}
           </div>
         )}
       </div>
