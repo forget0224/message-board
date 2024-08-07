@@ -26,11 +26,11 @@ export default function Boards({
             content={note.content}
             from={note.from}
             fromId={note.userId}
-            noteId={note.id}
+            noteId={note.noteId}
             showAdd={showAdd}
             userId={userId}
             deleteNote={deleteNote}
-            showOptions={activeNoteId === note.id}
+            showOptions={activeNoteId === note.noteId}
             onToggleOptions={onToggleOptions}
             onEdit={onEdit}
             onReply={onReply}

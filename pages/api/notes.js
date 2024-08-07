@@ -1,6 +1,6 @@
 let notesData = [
   {
-    id: 1,
+    noteId: 1,
     userId: 'user-1',
     to: 'Alice',
     content: 'Meeting at 3 PM',
@@ -22,7 +22,7 @@ let notesData = [
     ],
   },
   {
-    id: 2,
+    noteId: 2,
     userId: 'user-2',
     to: 'John',
     content: 'Project deadline extended',
@@ -38,7 +38,7 @@ let notesData = [
     ],
   },
   {
-    id: 3,
+    noteId: 3,
     userId: 'user-3',
     to: 'Jane',
     content: 'Lunch at 12?',
@@ -47,7 +47,7 @@ let notesData = [
     replies: [],
   },
   {
-    id: 4,
+    noteId: 4,
     userId: 'user-4',
     to: 'Tom',
     content: 'Code review session',
@@ -69,7 +69,7 @@ let notesData = [
     ],
   },
   {
-    id: 5,
+    noteId: 5,
     userId: 'user-5',
     to: 'Jerry',
     content: 'Design mockup ready',
@@ -85,7 +85,7 @@ let notesData = [
     ],
   },
   {
-    id: 6,
+    noteId: 6,
     userId: 'user-6',
     to: 'Anna',
     content: 'Client feedback received',
@@ -106,7 +106,7 @@ export default function handler(req, res) {
     }
     case 'POST': {
       const newNote = req.body
-      newNote.id = notesData.length + 1
+      newNote.noteId = notesData.length + 1
       newNote.timestamp = new Date()
         .toISOString()
         .slice(0, 16)
@@ -120,7 +120,7 @@ export default function handler(req, res) {
     case 'PUT': {
       const { noteId, userId, to, content, reply } = req.body
       const noteIndex = notesData.findIndex(
-        (note) => note.id === noteId && note.userId === userId,
+        (note) => note.noteId === noteId && note.userId === userId,
       )
       if (noteIndex !== -1) {
         if (reply) {
@@ -139,7 +139,7 @@ export default function handler(req, res) {
     case 'DELETE': {
       const { noteId, userId } = req.body
       const noteIndex = notesData.findIndex(
-        (note) => note.id === noteId && note.userId === userId,
+        (note) => note.noteId === noteId && note.userId === userId,
       )
       if (noteIndex !== -1) {
         notesData.splice(noteIndex, 1)

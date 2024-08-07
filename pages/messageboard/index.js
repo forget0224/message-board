@@ -52,7 +52,7 @@ export default function Home() {
       try {
         const data = await fetchNotes()
         setNotesData(data)
-        setFilteredNotes(data)
+        // setFilteredNotes(data)
       } catch (error) {
         console.error('載入notes失敗', error)
       }
@@ -62,6 +62,9 @@ export default function Home() {
     loadNotes()
   }, [])
 
+  useEffect(() => {
+    setFilteredNotes(notesData)
+  }, [notesData])
   const handleAddNote = async () => {
     const newNote = { to, content: message, from: username, userId }
     try {
@@ -79,7 +82,7 @@ export default function Home() {
   const handleDelete = async (noteId, userId) => {
     try {
       await deleteNote(noteId, userId)
-      setNotesData(notesData.filter((note) => note.id !== noteId))
+      setNotesData(notesData.filter((note) => note.noteId !== noteId))
     } catch (error) {
       console.error('刪除失敗', error)
     }
@@ -97,7 +100,7 @@ export default function Home() {
     setActiveNoteId(noteId === activeNoteId ? null : noteId)
   }
   const handleEdit = (noteId) => {
-    const note = notesData.find((note) => note.id === noteId)
+    const note = notesData.find((note) => note.noteId === noteId)
     setCurrentNote(note)
     setUsername(username)
     setTo(note.to)
@@ -107,7 +110,7 @@ export default function Home() {
   }
 
   const handleReply = (noteId) => {
-    const note = notesData.find((note) => note.id === noteId)
+    const note = notesData.find((note) => note.noteId === noteId)
     setCurrentNote(note)
     setUsername(username)
     setTo(note.to || '')
@@ -128,10 +131,10 @@ export default function Home() {
     try {
       const updatedNote = { ...currentNote, to, content: message }
       console.log(updatedNote)
-      await updateNote(currentNote.id, updatedNote)
+      await updateNote(currentNote.noteId, updatedNote)
       setNotesData(
         notesData.map((note) =>
-          note.id === updatedNote.id ? updatedNote : note,
+          note.noteId === updatedNote.noteId ? updatedNote : note,
         ),
       )
       handleCloseModal()
@@ -142,23 +145,33 @@ export default function Home() {
 
   const handleSubmitReply = async () => {
     try {
+      const existingReplies = currentNote.replies || []
+      const maxId =
+        existingReplies.length > 0
+          ? Math.max(...existingReplies.map((reply) => reply.id))
+          : 0
+      const newId = maxId + 1
+
       const reply = {
         from: username,
         content: message,
         timestamp: new Date().toISOString(),
+        id: newId,
       }
+
       const updatedNote = {
         ...currentNote,
         replies: [...currentNote.replies, reply],
       }
-
-      await updateNote(currentNote.id, updatedNote)
+      console.log(updatedNote)
+      await updateNote(currentNote.noteId, updatedNote)
       setNotesData(
         notesData.map((note) =>
-          note.id === updatedNote.id ? updatedNote : note,
+          note.noteId === updatedNote.noteId ? updatedNote : note,
         ),
       )
       handleCloseModal()
+      console.log(notesData)
     } catch (error) {
       console.error('回覆失敗', error)
     }
@@ -250,9 +263,18 @@ export default function Home() {
         )}
       </div>
       {isModalOpen && (
-        <Modal isOpen={isModalOpen} onClose={handleCloseModal}>
+        <Modal
+          isOpen={isModalOpen}
+          onClose={handleCloseModal}
+          note={currentNote}
+          replies={currentNote.replies}
+          onToggleOptions={handleToggleOptions}
+        >
           {modalContent === 'edit' && (
             <>
+              <div className="lg:px-4 w-full text-center">
+                <h1 className="lg:text-2xl">編輯留言</h1>
+              </div>
               <Typearea
                 username={username}
                 setUsername={setUsername}
@@ -268,6 +290,9 @@ export default function Home() {
           )}
           {modalContent === 'reply' && (
             <>
+              <div className="lg:px-4 w-full text-center">
+                <h1 className="lg:text-2xl">回覆留言</h1>
+              </div>
               <Typearea
                 username={username}
                 setUsername={setUsername}
