@@ -126,16 +126,7 @@ export default function Home() {
   const handleToggleOptions = (noteId) => {
     setActiveNoteId(noteId === activeNoteId ? null : noteId)
   }
-  // const handleEdit = (noteId) => {
-  //   const note = notesData.find((note) => note.noteId === noteId)
-  //   setCurrentNote(note)
-  //   setUsername(username)
-  //   setTo(note.to)
-  //   setMessage(note.content)
-  //   setModalContent('edit')
-  //   setMode('modal')
-  //   setIsModalOpen(true)
-  // }
+
   const handleEdit = (noteId, replyId = null) => {
     if (replyId) {
       const note = notesData.find((note) => note.noteId === noteId)
@@ -222,90 +213,6 @@ export default function Home() {
       console.error('更新失敗:', error)
     }
   }
-
-  // const handleSubmitEdit = async () => {
-  //   try {
-  //     const updatedNote = { ...currentNote, to, content: message }
-  //     console.log(updatedNote)
-  //     await updateNote(currentNote.noteId, updatedNote)
-  //     setNotesData(
-  //       notesData.map((note) =>
-  //         note.noteId === updatedNote.noteId ? updatedNote : note,
-  //       ),
-  //     )
-  //     handleCloseModal()
-  //   } catch (error) {
-  //     console.error('更新失敗:', error)
-  //   }
-  // }
-
-  // const handleSubmitReply = async () => {
-  //   try {
-  //     const existingReplies = currentNote.replies || []
-  //     const maxId =
-  //       existingReplies.length > 0
-  //         ? Math.max(...existingReplies.map((reply) => reply.id))
-  //         : 0
-  //     const newId = maxId + 1
-
-  //     const reply = {
-  //       from: username,
-  //       content: message,
-  //       timestamp: new Date().toISOString(),
-  //       id: newId,
-  //       userId,
-  //       noteId: currentNote.noteId,
-  //     }
-
-  //     const updatedNote = {
-  //       ...currentNote,
-  //       replies: [...currentNote.replies, reply],
-  //     }
-  //     console.log(updatedNote)
-  //     await updateNote(currentNote.noteId, updatedNote)
-  //     setNotesData(
-  //       notesData.map((note) =>
-  //         note.noteId === updatedNote.noteId ? updatedNote : note,
-  //       ),
-  //     )
-  //     handleCloseModal()
-  //     console.log(notesData)
-  //   } catch (error) {
-  //     console.error('回覆失敗', error)
-  //   }
-  // }
-
-  // const handleSubmitEdit = async () => {
-  //   try {
-  //     if (currentNote.isReply) {
-  //       const parentNote = notesData.find(
-  //         (note) => note.noteId === currentNote.noteId,
-  //       )
-  //       const updatedReplies = parentNote.replies.map((reply) =>
-  //         reply.id === currentNote.id ? { ...reply, content: message } : reply,
-  //       )
-  //       const updatedNote = { ...parentNote, replies: updatedReplies }
-  //       await updateNote(currentNote.noteId, updatedNote)
-  //       setNotesData(
-  //         notesData.map((note) =>
-  //           note.noteId === updatedNote.noteId ? updatedNote : note,
-  //         ),
-  //       )
-  //       setCurrentNote(updatedNote)
-  //     } else {
-  //       const updatedNote = { ...currentNote, to, content: message }
-  //       await updateNote(currentNote.noteId, updatedNote)
-  //       setNotesData(
-  //         notesData.map((note) =>
-  //           note.noteId === updatedNote.noteId ? updatedNote : note,
-  //         ),
-  //       )
-  //       setCurrentNote(updatedNote)
-  //     }
-  //   } catch (error) {
-  //     console.error('更新失敗:', error)
-  //   }
-  // }
 
   const handleSubmitReply = async () => {
     try {

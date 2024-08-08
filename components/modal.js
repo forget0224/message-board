@@ -6,7 +6,6 @@ export default function modal({
   onClose,
   children,
   note,
-  replies,
   onToggleOptions,
   activeNoteId,
   userId,
@@ -22,7 +21,7 @@ export default function modal({
       ...reply,
       isReply: true,
       noteId: note.noteId,
-      id: index + 1, // 確保有一個唯一的id
+      id: index + 1,
     }))
     return [noteItem, ...replies]
   }
@@ -40,9 +39,6 @@ export default function modal({
       <div className="relative w-full max-w-3xl px-4  h-auto">
         <div className="bg-white rounded-lg shadow dark:bg-gray-700 relative z-50">
           <div className="flex items-start justify-between  p-3 border-b rounded-t dark:border-gray-600">
-            {/* <h3 className="text-gray-900 text-xl lg:text-2xl font-semibold dark:text-white">
-              Modal Title
-            </h3> */}
             <button
               type="button"
               className="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm  ml-auto inline-flex items-center dark:hover:bg-gray-600 dark:hover:text-white"
@@ -55,38 +51,12 @@ export default function modal({
           <div className="p-6 flex  flex-col sm:flex-row">
             <div className="flex-1 border-b sm:border-none">
               <div className="p-3 flex sm:flex-col flex-row space-x-4 sm:space-x-0 sm:space-y-4 sm:overflow-y-auto overflow-x-scroll sm:overflow-x-hidden  max-h-[50vh] items-center">
-                {/* <Note
-                  {...note}
-                  showAdd={false}
-                  onReply={null}
-                  onEdit={null}
-                  noteId={note.id}
-                  onToggleOptions={onToggleOptions}
-                  mode="modal"
-                />
-                {replies.map((reply, index) => (
-                  <div key={index} className="flex flex-col">
-                    <Note
-                      {...reply}
-                      showAdd={false}
-                      onReply={null}
-                      from={note.from}
-                      onEdit={null}
-                      mode="modal"
-                    />
-                  </div>
-                ))} */}
                 {notesModal.map((noteItem, index) => (
                   <Note
                     key={index}
                     {...noteItem}
                     showAdd={false}
                     onReply={null}
-                    // onEdit={
-                    //   noteItem.isReply
-                    //     ? () => onEdit(noteItem.noteId, noteItem.id)
-                    //     : () => onEdit(noteItem.noteId)
-                    // }
                     onEdit={onEdit}
                     deleteNote={deleteNote}
                     noteId={noteItem.noteId}
