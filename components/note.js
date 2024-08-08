@@ -229,6 +229,7 @@ export default function Note({
                     onClick={() => {
                       if (mode === 'modal') {
                         setModalContent('edit')
+                        onEdit(noteId, id)
                       } else {
                         onEdit(noteId)
                       }

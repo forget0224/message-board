@@ -18,16 +18,17 @@ export default function modal({
 }) {
   const flattenNote = (note) => {
     const noteItem = { ...note, isReply: false }
-    const replies = note.replies.map((reply) => ({
+    const replies = (note.replies || []).map((reply, index) => ({
       ...reply,
       isReply: true,
       noteId: note.noteId,
+      id: index + 1, // 確保有一個唯一的id
     }))
     return [noteItem, ...replies]
   }
 
   const notesModal = flattenNote(note)
-
+  console.log(notesModal)
   return (
     <div
       className={`fixed inset-0 z-50 flex items-center justify-center  ${isOpen ? '' : 'hidden'}`}
@@ -81,7 +82,12 @@ export default function modal({
                     {...noteItem}
                     showAdd={false}
                     onReply={null}
-                    onEdit={null}
+                    // onEdit={
+                    //   noteItem.isReply
+                    //     ? () => onEdit(noteItem.noteId, noteItem.id)
+                    //     : () => onEdit(noteItem.noteId)
+                    // }
+                    onEdit={onEdit}
                     deleteNote={deleteNote}
                     noteId={noteItem.noteId}
                     id={index}

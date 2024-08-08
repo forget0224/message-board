@@ -67,7 +67,13 @@ export default function Home() {
   }, [notesData])
 
   const handleAddNote = async () => {
-    const newNote = { to, content: message, from: username, userId }
+    const newNote = {
+      to,
+      content: message,
+      from: username,
+      userId,
+      replies: [],
+    }
     try {
       const data = await addNote(newNote)
       console.log(data)
@@ -120,12 +126,38 @@ export default function Home() {
   const handleToggleOptions = (noteId) => {
     setActiveNoteId(noteId === activeNoteId ? null : noteId)
   }
-  const handleEdit = (noteId) => {
-    const note = notesData.find((note) => note.noteId === noteId)
-    setCurrentNote(note)
-    setUsername(username)
-    setTo(note.to)
-    setMessage(note.content)
+  // const handleEdit = (noteId) => {
+  //   const note = notesData.find((note) => note.noteId === noteId)
+  //   setCurrentNote(note)
+  //   setUsername(username)
+  //   setTo(note.to)
+  //   setMessage(note.content)
+  //   setModalContent('edit')
+  //   setMode('modal')
+  //   setIsModalOpen(true)
+  // }
+  const handleEdit = (noteId, replyId = null) => {
+    if (replyId) {
+      const note = notesData.find((note) => note.noteId === noteId)
+      const reply = note.replies.find((reply) => reply.id === replyId)
+      setCurrentNote({ ...reply, isReply: true, noteId: noteId })
+      setUsername(username)
+      setTo(note.to)
+      setMessage(reply.content)
+    } else {
+      const note = notesData.find((note) => note.noteId === noteId)
+      if (note) {
+        const { replies, ...noteWithoutReplies } = note // 移除 replies 資料
+        setCurrentNote({
+          ...noteWithoutReplies,
+          isReply: false,
+          originalReplies: note.replies,
+        })
+        setUsername(note.from)
+        setTo(note.to)
+        setMessage(note.content)
+      }
+    }
     setModalContent('edit')
     setMode('modal')
     setIsModalOpen(true)
@@ -149,6 +181,46 @@ export default function Home() {
     setMode('boards')
     setTo('')
     setMessage('')
+  }
+  const handleSubmitEdit = async () => {
+    try {
+      let updatedNote
+
+      if (currentNote.isReply) {
+        const parentNote = notesData.find(
+          (note) => note.noteId === currentNote.noteId,
+        )
+        const updatedReplies = parentNote.replies.map((reply) =>
+          reply.id === currentNote.id ? { ...reply, content: message } : reply,
+        )
+        updatedNote = { ...parentNote, replies: updatedReplies }
+        await updateNote(currentNote.noteId, updatedNote)
+        setNotesData(
+          notesData.map((note) =>
+            note.noteId === updatedNote.noteId ? updatedNote : note,
+          ),
+        )
+      } else {
+        updatedNote = {
+          ...currentNote,
+          to,
+          content: message,
+          replies: currentNote.originalReplies || [],
+        }
+        await updateNote(currentNote.noteId, updatedNote)
+        setNotesData(
+          notesData.map((note) =>
+            note.noteId === updatedNote.noteId ? updatedNote : note,
+          ),
+        )
+      }
+
+      setCurrentNote(updatedNote)
+      setMessage('')
+      setModalContent('reply')
+    } catch (error) {
+      console.error('更新失敗:', error)
+    }
   }
 
   // const handleSubmitEdit = async () => {
@@ -203,37 +275,37 @@ export default function Home() {
   //   }
   // }
 
-  const handleSubmitEdit = async () => {
-    try {
-      if (currentNote.isReply) {
-        const parentNote = notesData.find(
-          (note) => note.noteId === currentNote.noteId,
-        )
-        const updatedReplies = parentNote.replies.map((reply) =>
-          reply.id === currentNote.id ? { ...reply, content: message } : reply,
-        )
-        const updatedNote = { ...parentNote, replies: updatedReplies }
-        await updateNote(currentNote.noteId, updatedNote)
-        setNotesData(
-          notesData.map((note) =>
-            note.noteId === updatedNote.noteId ? updatedNote : note,
-          ),
-        )
-        setCurrentNote(updatedNote)
-      } else {
-        const updatedNote = { ...currentNote, to, content: message }
-        await updateNote(currentNote.noteId, updatedNote)
-        setNotesData(
-          notesData.map((note) =>
-            note.noteId === updatedNote.noteId ? updatedNote : note,
-          ),
-        )
-        setCurrentNote(updatedNote)
-      }
-    } catch (error) {
-      console.error('更新失敗:', error)
-    }
-  }
+  // const handleSubmitEdit = async () => {
+  //   try {
+  //     if (currentNote.isReply) {
+  //       const parentNote = notesData.find(
+  //         (note) => note.noteId === currentNote.noteId,
+  //       )
+  //       const updatedReplies = parentNote.replies.map((reply) =>
+  //         reply.id === currentNote.id ? { ...reply, content: message } : reply,
+  //       )
+  //       const updatedNote = { ...parentNote, replies: updatedReplies }
+  //       await updateNote(currentNote.noteId, updatedNote)
+  //       setNotesData(
+  //         notesData.map((note) =>
+  //           note.noteId === updatedNote.noteId ? updatedNote : note,
+  //         ),
+  //       )
+  //       setCurrentNote(updatedNote)
+  //     } else {
+  //       const updatedNote = { ...currentNote, to, content: message }
+  //       await updateNote(currentNote.noteId, updatedNote)
+  //       setNotesData(
+  //         notesData.map((note) =>
+  //           note.noteId === updatedNote.noteId ? updatedNote : note,
+  //         ),
+  //       )
+  //       setCurrentNote(updatedNote)
+  //     }
+  //   } catch (error) {
+  //     console.error('更新失敗:', error)
+  //   }
+  // }
 
   const handleSubmitReply = async () => {
     try {
@@ -370,6 +442,7 @@ export default function Home() {
           modalContent={modalContent}
           setModalContent={setModalContent}
           deleteNote={handleDelete}
+          onEdit={handleEdit}
         >
           {modalContent === 'edit' && (
             <>
