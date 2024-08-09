@@ -5,6 +5,7 @@ import Boards from '@/components/boards'
 import Header from '@/components/header'
 import Modal from '@/components/modal'
 import FormButton from '@/components/formButton'
+import { arrayMove } from '@dnd-kit/sortable'
 import { v4 as uuidv4 } from 'uuid'
 import {
   fetchNotes,
@@ -38,11 +39,6 @@ export default function Home() {
   const [mode, setMode] = useState('boards')
   const notesPerPage = 6
   const totalPages = Math.ceil(filteredNotes.length / notesPerPage)
-
-  const handlePageChange = (page) => {
-    setCurrentPage(page)
-  }
-
   useEffect(() => {
     const initUserId = () => {
       const id = getUserId()
@@ -76,7 +72,6 @@ export default function Home() {
     }
     try {
       const data = await addNote(newNote)
-      console.log(data)
       setNotesData([data, ...notesData])
       setHasUsername(true)
       setTo('')
@@ -279,11 +274,35 @@ export default function Home() {
     }
     setCurrentPage(1)
   }
-
+  const handlePageChange = (page) => {
+    setCurrentPage(page)
+  }
   const paginatedNotes = filteredNotes.slice(
     (currentPage - 1) * notesPerPage,
     currentPage * notesPerPage,
   )
+  const handleDragEnd = (event) => {
+    const { active, over } = event
+
+    if (!over || active.id === over.id) {
+      return
+    }
+
+    const oldIndex = filteredNotes.findIndex(
+      (note) => note.noteId === active.id,
+    )
+    const newIndex = filteredNotes.findIndex((note) => note.noteId === over.id)
+
+    if (oldIndex === -1 || newIndex === -1) {
+      return
+    }
+
+    const newOrderedNotes = arrayMove(filteredNotes, oldIndex, newIndex)
+
+    setFilteredNotes(newOrderedNotes)
+    setNotesData(newOrderedNotes) // 直接使用用戶新排序後的結果
+  }
+
   return (
     <>
       <div className="bg-[#A8BEC3] min-h-screen flex flex-col">
@@ -300,7 +319,6 @@ export default function Home() {
           <h1 className="font-bold">Message Board</h1>
           <Boards
             showAdd={showAdd}
-            notesData={notesData}
             paginatedNotes={paginatedNotes}
             userId={userId}
             deleteNote={handleDelete}
@@ -310,6 +328,7 @@ export default function Home() {
             onReply={handleReply}
             searchQuery={searchQuery}
             mode={mode}
+            onDragEnd={handleDragEnd}
           />
           {totalPages > 1 && (
             <Pagination

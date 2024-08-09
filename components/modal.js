@@ -27,7 +27,7 @@ export default function modal({
   }
 
   const notesModal = flattenNote(note)
-  console.log(notesModal)
+
   return (
     <div
       className={`fixed inset-0 z-50 flex items-center justify-center  ${isOpen ? '' : 'hidden'}`}
@@ -59,7 +59,6 @@ export default function modal({
                     onReply={null}
                     onEdit={onEdit}
                     deleteNote={deleteNote}
-                    noteId={noteItem.noteId}
                     id={index}
                     userId={userId}
                     fromId={noteItem.userId}
