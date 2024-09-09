@@ -123,17 +123,16 @@ export default function Home() {
   }
 
   const handleEdit = (noteId, replyId = null) => {
+    const note = notesData.find((note) => note.noteId === noteId)
     if (replyId) {
-      const note = notesData.find((note) => note.noteId === noteId)
       const reply = note.replies.find((reply) => reply.id === replyId)
       setCurrentNote({ ...reply, isReply: true, noteId: noteId })
       setUsername(username)
       setTo(note.to)
       setMessage(reply.content)
     } else {
-      const note = notesData.find((note) => note.noteId === noteId)
       if (note) {
-        const { replies, ...noteWithoutReplies } = note // 移除 replies 資料
+        const { replies, ...noteWithoutReplies } = note
         setCurrentNote({
           ...noteWithoutReplies,
           isReply: false,
